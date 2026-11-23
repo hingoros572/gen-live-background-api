@@ -6,6 +6,18 @@ function sendJson(res, status, body) {
 }
 
 module.exports = async function handler(req, res) {
+  // Allow browser-based testing from ReqBin. The mobile app itself does not
+  // rely on browser CORS, but ReqBin may send an OPTIONS preflight first.
+  res.setHeader("Access-Control-Allow-Origin", "https://reqbin.com");
+  res.setHeader("Vary", "Origin");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).end();
+    return;
+  }
+
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return sendJson(res, 405, { error: "Method not allowed" });
