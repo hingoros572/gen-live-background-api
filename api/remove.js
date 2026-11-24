@@ -83,11 +83,7 @@ module.exports = async function handler(req, res) {
     }
 
     const imageBytes = Buffer.from(await upstream.arrayBuffer());
-    res.status(upstream.status);
-    res.setHeader("Content-Type", contentType || "image/png");
-    res.setHeader("Cache-Control", "no-store");
-    res.setHeader("X-Request-ID", upstream.headers.get("x-request-id") || "");
-    return res.send(imageBytes);
+    return sendJson(res, upstream.status, { contentType: contentType || "image/png", data: imageBytes.toString("base64") });
   } catch (error) {
     return sendJson(res, 502, { error: "Could not reach Poof API", message: error.message });
   }
